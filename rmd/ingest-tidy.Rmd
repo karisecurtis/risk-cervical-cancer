@@ -7,16 +7,35 @@ output: html_notebook
 This sources all the functions we will need to ingest and tidy our data!
 ```{r Sourced Functions}
 library(magrittr)
-source(here::here("/src/ingest.R"))
+source(here::here("./src/ingest.R"))
+source(here::here("./src/removechar.R"))
+source(here::here("./src/colclean.R"))
 ```
 
 ## Ingest
 This block ingests the Cervical cancer (Risk Factors) data from [UCI's Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Cervical+cancer+%28Risk+Factors%29). The data are not likely to change, so only run this once!
 
 ```{r Ingest Data, eval=FALSE}
-getdata("https://archive.ics.uci.edu/ml/machine-learning-databases/00383/risk_factors_cervical_cancer.csv")
+ingest("https://archive.ics.uci.edu/ml/machine-learning-databases/00383/risk_factors_cervical_cancer.csv")
 ```
 
 ##Tidy
-```{r }
+This first chunk just pulls the data we ingested into the local environment.
+
+```{r Pulls Data In}
+data <- readr::read_rds(here::here("./data/raw/raw-data.rds"))
+```
+
+This next chunk fixes the instances of "?" in the data and replaces them with an NA and then converts the columns to numeric. The function "removechar" it uses takes any dataset (X), value that a cell might have (Y), and replaces it with any other value (Z). 
+
+```{r Cleans ? Marks}
+removechar(data, "?", NA)
+```
+
+This next chunk fixes the column names to be all lower case and with underscores between words. The function "colclean" takes a dataset (x) and replaces all instances of a character (y) with a new character (z).
+
+```{r Cleans Column Names}
+data <- colclean(data, "\\.\\.", ".")
+data <- colclean(data, "\\.", "_")
+colnames(data) <- tolower(colnames(data))
 ```
