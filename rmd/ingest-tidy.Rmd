@@ -7,9 +7,10 @@ output: html_notebook
 This sources all the functions we will need to ingest and tidy our data!
 ```{r Sourced Functions}
 library(magrittr)
-source(here::here("./src/ingest.R"))
-source(here::here("./src/removechar.R"))
-source(here::here("./src/colclean.R"))
+source(here::here("./r/ingest.R"))
+source(here::here("./r/coltype.R"))
+source(here::here("./r/removechar.R"))
+source(here::here("./r/colclean.R"))
 ```
 
 ## Ingest
@@ -29,13 +30,17 @@ data <- readr::read_rds(here::here("./data/raw/raw-data.rds"))
 This next chunk fixes the instances of "?" in the data and replaces them with an NA and then converts the columns to numeric. The function "removechar" it uses takes any dataset (X), value that a cell might have (Y), and replaces it with any other value (Z). 
 
 ```{r Cleans ? Marks}
-removechar(data, "?", NA)
+data <- coltype(data, as.character)
+data <- removechar(data, "?", NA)
 ```
 
 This next chunk fixes the column names to be all lower case and with underscores between words. The function "colclean" takes a dataset (x) and replaces all instances of a character (y) with a new character (z).
 
 ```{r Cleans Column Names}
-data <- colclean(data, "\\.\\.", ".")
+data <- colclean(data, "\\.$", "")
+data <- colclean(data, "\\.\\.", "_")
 data <- colclean(data, "\\.", "_")
 colnames(data) <- tolower(colnames(data))
 ```
+
+This next section addresses the fact that many numerics are factors with weird levels (because the "?" were removed but considered factor levels). This makes them all numerics.
