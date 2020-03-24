@@ -16,7 +16,7 @@ source(here::here("./r/colclean.R"))
 ## Ingest
 This block ingests the Cervical cancer (Risk Factors) data from [UCI's Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Cervical+cancer+%28Risk+Factors%29). The data are not likely to change, so only run this once!
 
-```{r Ingest Data, eval=FALSE}
+```{r Ingest Data}
 ingest("https://archive.ics.uci.edu/ml/machine-learning-databases/00383/risk_factors_cervical_cancer.csv")
 ```
 
@@ -27,11 +27,12 @@ This first chunk just pulls the data we ingested into the local environment.
 data <- readr::read_rds(here::here("./data/raw/raw-data.rds"))
 ```
 
-This next chunk fixes the instances of "?" in the data and replaces them with an NA and then converts the columns to numeric. The function "removechar" it uses takes any dataset (X), value that a cell might have (Y), and replaces it with any other value (Z). 
+This next chunk fixes the instances of "?" in the data. It first changes all columns to characters, replaces the "?" with NA, and then converts the columns to numeric. The function "coltype" takes a dataframe (x) and converts all column types to the type specified (y). The function "removechar" it uses takes any dataset (x), value that a cell might have (y), and replaces it with any other value (z). 
 
 ```{r Cleans ? Marks}
 data <- coltype(data, as.character)
 data <- removechar(data, "?", NA)
+data <-coltype(data, as.numeric)
 ```
 
 This next chunk fixes the column names to be all lower case and with underscores between words. The function "colclean" takes a dataset (x) and replaces all instances of a character (y) with a new character (z).
@@ -43,4 +44,8 @@ data <- colclean(data, "\\.", "_")
 colnames(data) <- tolower(colnames(data))
 ```
 
-This next section addresses the fact that many numerics are factors with weird levels (because the "?" were removed but considered factor levels). This makes them all numerics.
+This next section saves the data to a tidy data frame & cleans the environment.
+```{r Saves Data}
+data %>% readr::write_rds(here::here("./data/tidy/tidy-data.rds"))
+rm(list = ls())
+```
