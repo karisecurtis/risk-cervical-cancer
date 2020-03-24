@@ -20,7 +20,7 @@ This block ingests the Cervical Cancer (Risk Factors) Data from [UCI's Machine L
 ingest("https://archive.ics.uci.edu/ml/machine-learning-databases/00383/risk_factors_cervical_cancer.csv")
 ```
 
-##Tidy
+## Tidy
 This first chunk just pulls the data we ingested into the local environment.
 
 ```{r Pulls Data In}
@@ -44,6 +44,7 @@ data <- colclean(data, "\\.", "_")
 colnames(data) <- tolower(colnames(data))
 ```
 
+## Saves Data
 This next section saves the data to a tidy data frame & cleans the environment.
 ```{r Saves Data}
 data %>% readr::write_rds(here::here("./data/tidy/tidy-data.rds"))

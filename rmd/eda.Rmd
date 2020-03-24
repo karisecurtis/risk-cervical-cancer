@@ -3,9 +3,11 @@ title: "EDA to Guide Feature Engineering"
 output: html_notebook
 ---
 
-##Ingest
+## Ingest
 This first chunk just pulls the data we ingested into the local environment.
 
 ```{r Pulls Data In}
 data <- readr::read_rds(here::here("./data/tidy/tidy-data.rds"))
 ```
+
+##
