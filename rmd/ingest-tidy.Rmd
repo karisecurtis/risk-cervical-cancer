@@ -1,0 +1,24 @@
+---
+title: "Ingest & Tidy Data"
+output: html_notebook
+---
+
+## Sourced Functions
+This sources all the functions we will need to ingest and tidy our data!
+```{r Sourced Functions}
+source(here::here("/src/ingest.R"))
+```
+
+## Ingest
+This block ingests the Cervical cancer (Risk Factors) data from [UCI's Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Cervical+cancer+%28Risk+Factors%29). The data are not likely to change, so only run this once!
+
+```{r Ingest Data, eval=FALSE}
+getdata("https://archive.ics.uci.edu/ml/machine-learning-databases/00383/risk_factors_cervical_cancer.csv")
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
