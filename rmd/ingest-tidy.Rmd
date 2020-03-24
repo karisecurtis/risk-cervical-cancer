@@ -6,6 +6,7 @@ output: html_notebook
 ## Sourced Functions
 This sources all the functions we will need to ingest and tidy our data!
 ```{r Sourced Functions}
+library(magrittr)
 source(here::here("/src/ingest.R"))
 ```
 
