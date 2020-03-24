@@ -14,7 +14,7 @@ source(here::here("./r/colclean.R"))
 ```
 
 ## Ingest
-This block ingests the Cervical cancer (Risk Factors) data from [UCI's Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Cervical+cancer+%28Risk+Factors%29). The data are not likely to change, so only run this once!
+This block ingests the Cervical Cancer (Risk Factors) Data from [UCI's Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Cervical+cancer+%28Risk+Factors%29). The data are not likely to change, so only run this once!
 
 ```{r Ingest Data}
 ingest("https://archive.ics.uci.edu/ml/machine-learning-databases/00383/risk_factors_cervical_cancer.csv")
@@ -32,7 +32,7 @@ This next chunk fixes the instances of "?" in the data. It first changes all col
 ```{r Cleans ? Marks}
 data <- coltype(data, as.character)
 data <- removechar(data, "?", NA)
-data <-coltype(data, as.numeric)
+data <- coltype(data, as.numeric)
 ```
 
 This next chunk fixes the column names to be all lower case and with underscores between words. The function "colclean" takes a dataset (x) and replaces all instances of a character (y) with a new character (z).
