@@ -7,7 +7,76 @@ output: html_notebook
 This first chunk just pulls the data we ingested into the local environment.
 
 ```{r Pulls Data In}
+library(magrittr)
 data <- readr::read_rds(here::here("./data/tidy/tidy-data.rds"))
 ```
 
-##
+## Summarizes Dataset
+```{r Summary}
+psych::describe(data)
+```
+
+## Examines Potential Outcome Variables
+Our target variables (as indicated in the [original study](https://repositorio.inesctec.pt/bitstream/123456789/7179/1/P-00N-9XR.pdf) and a [subsequent study](https://ieeexplore.ieee.org/document/8070120) are the four types of tests that one uses to diagnose HPV:
+
+*Hinselmann
+*Schiller
+*Cytology
+*Biospy
+
+```{r Cancer Diagnoses}
+data %>% 
+  dplyr::summarise(
+    hinselmann_pos = sum(hinselmann),
+    schiller_pos = sum(schiller),
+    cytology_pos = sum(citology),
+    biopsy_pos = sum(biopsy)
+    )
+```
+
+```{r all tests pos}
+data %>%
+  dplyr::filter(
+    hinselmann == 1 &
+      schiller == 1 &
+      citology == 1 &
+      biopsy == 1
+    ) %>%
+  dplyr::tally()
+```
+
+Only 6 records have all four show positive. Our risk model will likely need to be applied to each and see which it predicts more readily. This will be a good chance to try to functionally program the calculations for odds ratios, Chi-square, and relative risk.
+
+## Examines Potential Risk Factors
+Accordng to the [CDC](https://www.cdc.gov/cancer/cervical/basic_info/risk_factors.htm), risk factors include:
+
+* Having HIV
+* Smoking
+* Using birth control pills for a long time (five or more years)
+* Having given birth to three or more children
+* Having several sexual partners
+
+The [American Cancer Society](https://www.cancer.org/cancer/cervical-cancer/causes-risks-prevention/risk-factors.html) has also suggested the following as risk factors:
+
+* Sexual history at a young age (before 18)
+* Having chlamydia
+
+They also recognize the following as a potentially protective factor:
+
+* Using an IUD
+
+Finally, [Cancer Research UK](https://www.cancerresearchuk.org/about-cancer/cervical-cancer/risks-causes) also recognizes the following as a risk factor:
+
+* Previous cancer diagnoses
+
+### Data on Sexual History
+
+
+```{r Sexual History}
+
+```
+
+```{r Pregnancies}
+
+```
+
