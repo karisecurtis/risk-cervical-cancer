@@ -152,3 +152,7 @@ analytical_set %>%
 ```
 
 This may help significantly in being able to calculate a "risk score" for testing positive for cervical cancer using any of these risk / protective factors.
+
+```{r clean up}
+rm(list = ls())
+```
