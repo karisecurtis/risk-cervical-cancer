@@ -2,4 +2,4 @@
 Karise M. Curtis, PhD
 
 # Other Contributors
-Ross E. Burton
+Ross E. Burton, PhD
