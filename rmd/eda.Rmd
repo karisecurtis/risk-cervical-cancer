@@ -45,7 +45,20 @@ data %>%
   dplyr::tally()
 ```
 
-Only 6 records have all four show positive. Our risk model will likely need to be applied to each and see which it predicts more readily. This will be a good chance to try to functionally program the calculations for odds ratios, Chi-square, and relative risk.
+Only 6 records have all four show positive.
+
+```{r any tests pos}
+data %>%
+  dplyr::filter(
+    hinselmann == 1 |
+      schiller == 1 |
+      citology == 1 |
+      biopsy == 1
+    ) %>%
+  dplyr::tally()
+```
+
+However, 102 show at least one of these tests being positive.
 
 ## Potential Risk Factors
 I looked at the following sources to consider potential risk factors:
@@ -69,13 +82,73 @@ They also recognize the following as a potentially protective factor:
 
 * Using an IUD
 
-### Data on Sexual History
+### Creating Boolean Indicators to Examine Those Factors
 
-```{r Sexual History}
+A few of our risk factors need to be turned into a boolean factor, particularly age of first sexual activity (under 18), number of pregancies (3+), number of sexual partners (3+), and birth control pills (5+) before we can use them later. 
 
+```{r Risk Factors}
+analytical_set <- data %>%
+  dplyr::mutate(
+    underage_sex = ifelse(first_sexual_intercourse < 18, 1,
+                          ifelse(is.na(first_sexual_intercourse), NA, 0)),
+    many_preg = ifelse (num_of_pregnancies >= 3, 1,
+                        ifelse(is.na(num_of_pregnancies), NA, 0)),
+    many_sp = ifelse (number_of_sexual_partners >= 3, 1,
+                        ifelse(is.na(number_of_sexual_partners), NA, 0)),
+    long_bc = ifelse (hormonal_contraceptives_years >= 5, 1,
+                        ifelse(is.na(hormonal_contraceptives_years), NA, 0))) %>%
+  dplyr::select(-c(
+    age, number_of_sexual_partners, first_sexual_intercourse, 
+    num_of_pregnancies, smokes_years, smokes_packs_year, 
+    hormonal_contraceptives_years, iud_years, stds_number,
+    stds_number_of_diagnosis, stds_time_since_first_diagnosis,
+    stds_time_since_first_diagnosis)) %>%
+  dplyr::select(hinselmann, schiller, citology, biopsy, dplyr::everything())
 ```
 
-```{r Pregnancies}
-
+```{r Risk Factors Present}
+analytical_set %>%
+    dplyr::summarize_if(is.numeric, sum, na.rm=TRUE)
 ```
 
+Several of the stds may need to be excluded in the analytical file because they'll mathematically drop out anyway with so few cases, but let's examine the counts by each outcome variable.
+
+```{r Risk Factors Hinselmann}
+analytical_set %>%
+  dplyr::filter(hinselmann == 1) %>%
+  dplyr::select(-c(hinselmann, schiller, citology, biopsy)) %>%
+    dplyr::summarize_if(is.numeric, sum, na.rm=TRUE)
+```
+
+```{r Risk Factors Schiller}
+analytical_set %>%
+  dplyr::filter(schiller == 1) %>%
+  dplyr::select(-c(hinselmann, schiller, citology, biopsy)) %>%
+    dplyr::summarize_if(is.numeric, sum, na.rm=TRUE)
+```
+
+```{r Risk Factors Cytology}
+analytical_set %>%
+  dplyr::filter(citology == 1) %>%
+  dplyr::select(-c(hinselmann, schiller, citology, biopsy)) %>%
+    dplyr::summarize_if(is.numeric, sum, na.rm=TRUE)
+```
+
+```{r Risk Factors Biopsy}
+analytical_set %>%
+  dplyr::filter(biopsy == 1) %>%
+  dplyr::select(-c(hinselmann, schiller, citology, biopsy)) %>%
+    dplyr::summarize_if(is.numeric, sum, na.rm=TRUE)
+```
+
+```{r Risk Factors ANY}
+analytical_set %>%
+  dplyr::filter(hinselmann == 1 |
+                  schiller == 1 |
+                  citology == 1 |
+                  biopsy == 1) %>%
+  dplyr::select(-c(hinselmann, schiller, citology, biopsy)) %>%
+    dplyr::summarize_if(is.numeric, sum, na.rm=TRUE)
+```
+
+This may help significantly in being able to calculate a "risk score" for testing positive for cervical cancer using any of these risk / protective factors.
