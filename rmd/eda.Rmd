@@ -16,6 +16,23 @@ data <- readr::read_rds(here::here("./data/tidy/tidy-data.rds"))
 psych::describe(data)
 ```
 
+##Correlation Matrix on Untransformed Variables
+
+```{r}
+data %>%
+  cor(method = 'pearson', use = 'complete.obs') %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column("var") %>%
+  dplyr::select(c(var, hinselmann, schiller, citology, biopsy)) %>%
+  dplyr::filter((hinselmann >.4 | hinselmann < -.4 |
+                  schiller >.4 | schiller < -.4 |
+                  citology >.4 | citology < -.4 |
+                  biopsy >.4 | biopsy < -.4) &
+                  (var != 'hinselmann' & var != 'schiller' &
+                     var != 'citology' & var != 'biopsy'))
+```
+Only one variable (before any feature engineering) is correlated with one of our outcome variables. This isn't boding well. 
+
 ## Potential Outcome Variables
 Our outcome variables (as indicated in the [original study](https://repositorio.inesctec.pt/bitstream/123456789/7179/1/P-00N-9XR.pdf) and a [subsequent study](https://ieeexplore.ieee.org/document/8070120) are the four types of tests that one uses to diagnose HPV:
 
@@ -152,6 +169,23 @@ analytical_set %>%
 ```
 
 This may help significantly in being able to calculate a "risk score" for testing positive for cervical cancer using any of these risk / protective factors.
+
+##Correlation Matrix on Transformed Variables
+
+```{r}
+analytical_set %>%
+  cor(method = 'pearson', use = 'complete.obs') %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column("var") %>%
+  dplyr::select(c(var, hinselmann, schiller, citology, biopsy)) %>%
+  dplyr::filter((hinselmann >.4 | hinselmann < -.4 |
+                  schiller >.4 | schiller < -.4 |
+                  citology >.4 | citology < -.4 |
+                  biopsy >.4 | biopsy < -.4) &
+                  (var != 'hinselmann' & var != 'schiller' &
+                     var != 'citology' & var != 'biopsy'))
+```
+Aaaaaaand nothing is correlated now. Great.
 
 ```{r clean up}
 rm(list = ls())
