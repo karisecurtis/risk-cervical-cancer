@@ -13,14 +13,62 @@ library(magrittr)
 data <- readr::read_rds(here::here("./data/tidy/tidy-data.rds"))
 ```
 
+## Checks how many are missing 
 
 ```{r}
-plot(cars)
+na_count <- as.data.frame(sapply(data, function(y) sum(length(which(is.na(y)))))) %>%
+  dplyr::rename(na_count_var = `sapply(data, function(y) sum(length(which(is.na(y)))))`) %>%
+  tibble::rownames_to_column("var")
+na_count %>%
+  dplyr::filter(na_count_var > 0)
+rm(na_count)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+We definitely need to remove the STDS and time since first/last diagnosis variables!
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+## Training & Test Split 
+```{r}
+subset <- data %>%
+  dplyr::mutate(pos_test = ifelse(hinselmann == 1 | 
+                                    schiller == 1 |
+                                    citology == 1 |
+                                    biopsy ==1, 1, 0),
+                pos_test = as.factor(pos_test)) %>%
+  dplyr::select(-c(hormonal_contraceptives, hormonal_contraceptives_years,
+                   iud, iud_years,
+                   stds:stds_time_since_last_diagnosis,
+                   #stds_time_since_first_diagnosis, stds_time_since_last_diagnosis,
+                   hinselmann, schiller,
+                   citology, biopsy))
+set.seed(100)
+train <- sample(nrow(subset), 0.7*nrow(subset), replace = FALSE)
+TrainSet <- subset[train,]
+ValidSet <- subset[-train,]
+rm(train)
+```
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+## Applying the Model
+```{r}
+model1 <- randomForest::randomForest(pos_test ~ .,
+                       data = TrainSet,
+                       mtry = 2,
+                       importance = TRUE,
+                       na.action = na.omit)
+model1
+model2 <- randomForest::randomForest(pos_test ~ .,
+                       data = TrainSet,
+                       mtry = 6,
+                       importance = TRUE,
+                       na.action = na.omit)
+model2
+```
 
+Well, this didn't work well.
+```{r}
+predTrain <- predict(model2, TrainSet, type = "class")
+predValid <- predict(model2, ValidSet, type = "class")
+# Checking classification accuracy
+mean(predValid == ValidSet$pos_test)                    
+table(predValid,ValidSet$pos_test)
+randomForest::varImpPlot(model2)
+```
